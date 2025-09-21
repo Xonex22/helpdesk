@@ -1,0 +1,118 @@
+<?php
+// Database connection settings
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "your_database_name";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+function getChartData($conn) {
+    $sql = "SELECT * FROM chart";
+    $result = $conn->query($sql);
+    
+    $data = array();
+    while ($row = $result->fetch_assoc()) {
+        $data[] = $row;
+    }
+    
+    return $data;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'chart_data') {
+    header('Content-Type: application/json');
+    echo json_encode(getChartData($conn));
+} else {
+    // Default to rendering HTML page
+    include 'welcome_message.php'; // Your HTML view file
+}
+
+$conn->close();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Donut Chart</title>
+    <!-- Include jQuery and Flot -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.pie.min.js"></script>
+</head>
+<body>
+    <div id="donut-chart" style="height: 300px;"></div>
+
+    <script>
+        $(function () {
+            function fetchChartData() {
+                $.ajax({
+                    url: 'index.php?action=chart_data', // PHP script URL
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        var donutData = [];
+
+                        // Process data received from PHP
+                        $.each(data, function(index, item) {
+                            donutData.push({
+                                label: item.category, // Adjust based on your data structure
+                                data: parseFloat(item.sub_category), // Adjust based on your data structure
+                                color: getRandomColor() // Generate a random color or set specific colors
+                            });
+                        });
+
+                        $.plot('#donut-chart', donutData, {
+                            series: {
+                                pie: {
+                                    show: true,
+                                    radius: 1,
+                                    innerRadius: 0.5,
+                                    label: {
+                                        show: true,
+                                        radius: 2 / 3,
+                                        formatter: labelFormatter,
+                                        threshold: 0.1
+                                    }
+                                }
+                            },
+                            legend: {
+                                show: false
+                            }
+                        });
+                    },
+                    error: function() {
+                        console.error('Failed to fetch chart data.');
+                    }
+                });
+            }
+
+            fetchChartData();
+
+            function labelFormatter(label, series) {
+                return '<div style="font-size:13px; text-align:center; padding:2px; color: #fff; font-weight: 600;">'
+                    + label
+                    + '<br>'
+                    + Math.round(series.percent) + '%</div>';
+            }
+
+            function getRandomColor() {
+                var letters = '0123456789ABCDEF';
+                var color = '#';
+                for (var i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+        });
+    </script>
+</body>
+</html>
+

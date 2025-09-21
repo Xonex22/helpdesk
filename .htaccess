@@ -1,0 +1,36 @@
+RewriteEngine On
+
+# Specific rule for login
+RewriteRule ^index$ index.html [L]
+RewriteRule ^login$ login.php [L]
+RewriteRule ^acknowledge$ acknowledge.php [L]
+RewriteRule ^conversation$ conversation.php [L]
+RewriteRule ^ticket-list ticket-list.php [L]
+RewriteRule ^user-list user-list.php [L]
+RewriteRule ^add-user add-user.php [L]
+RewriteRule ^department department.php [L]
+RewriteRule ^subsidiary subsidiary.php [L]
+RewriteRule ^request-type request-type.php [L]
+RewriteRule ^kra-list kra-list.php [L]
+RewriteRule ^category category.php [L]
+RewriteRule ^sub-category sub-category.php [L]
+RewriteRule ^support-group support-group.php [L]
+RewriteRule ^action-type$ action-type.php [L]
+RewriteRule ^severity$ severity.php [L]
+RewriteRule ^logout$ logout.php [L]
+RewriteRule ^ticket-details$ ticket-details.php [L]
+RewriteRule ^data-list$ data-list.php [L]
+RewriteRule ^workprogress$ workprogress.php [L]
+RewriteRule ^reassign$ reassign.php [L]
+RewriteRule ^onhold$ onhold.php [L]
+RewriteRule ^resolve$ resolve.php [L]
+RewriteRule ^closed$ closed.php [L]
+RewriteRule ^reject$ reject.php [L]
+RewriteRule ^404$ 404.php [L]
+
+
+
+# General rule for routing requests to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?$1 [L]
